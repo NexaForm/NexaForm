@@ -94,7 +94,3 @@ This project implements a flexible, secure, and customizable online questionnair
 
 ## License
 This project is licensed under the MIT License. See the `LICENSE` file for details.
-
----
-
-Feel free to customize the README further to match the exact requirements or branding of your project.
