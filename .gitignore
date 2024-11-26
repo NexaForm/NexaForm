@@ -30,7 +30,6 @@ coverage.out
 
 # Environment files
 .env
-.env.*
 
 # VSCode settings
 .vscode/
