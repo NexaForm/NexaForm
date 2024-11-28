@@ -1,7 +1,6 @@
 package logger
 
 import (
-	"NexaForm/config"
 	"fmt"
 	"strings"
 	"time"
@@ -18,7 +17,7 @@ type Logger struct {
 	UserID    string
 	Message   string
 	Context   []interface{}
-	config    config.Log
+	// config    config.Log
 }
 
 type Level string
@@ -91,7 +90,6 @@ func (l *Logger) Debug(endpoint, message string, data ...interface{}) {
 	l.Message = message
 	l.Context = data
 	fmt.Println(messageMaker(l))
-	fmt.Println(l.config.Address)
 }
 func (l *Logger) Info(endpoint, message string, data ...interface{}) {
 	l.ID = uuid.New().String()
