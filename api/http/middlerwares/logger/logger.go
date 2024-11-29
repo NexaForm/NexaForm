@@ -1,7 +1,11 @@
 package logger
 
 import (
+	"encoding/json"
 	"fmt"
+	"io"
+	"log"
+	"os"
 	"strings"
 	"time"
 
@@ -9,14 +13,14 @@ import (
 )
 
 type Logger struct {
-	ID        string
-	Timestamp time.Time
-	Level     Level
-	Service   string
-	Endpoint  string
-	UserID    string
-	Message   string
-	Context   []interface{}
+	ID        string        `json:"id"`
+	Timestamp time.Time     `json:"timestamp"`
+	Level     Level         `json:"level"`
+	Service   string        `json:"service"`
+	Endpoint  string        `json:"endpoint"`
+	UserID    string        `json:"user_id"`
+	Message   string        `json:"message"`
+	Context   []interface{} `json:"context"`
 	// config    config.Log
 }
 
@@ -76,8 +80,45 @@ func messageMaker(l *Logger) string {
 	return logMessage.String()
 }
 
-func addToFile() {}
-func addToDB()   {}
+func appendToFile(logger *Logger) {
+	// Create logs directory if it doesn't exist
+	os.Mkdir("logs", 0777)
+	// Open the log file. This creates the file if it doesn't exist, and opens it in append, create, and read/write mode.
+	file, err := os.OpenFile(fmt.Sprintf("./logs/%v_logs.json", logger.Level), os.O_APPEND|os.O_CREATE|os.O_RDWR, 0777)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	defer file.Close()
+
+	// Read existing data from the file
+	data, err := io.ReadAll(file)
+	if err != nil {
+		log.Println(err)
+	}
+	// Unmarshal JSON data into a slice of Logger structs
+	var jsonData []Logger
+	if err := json.Unmarshal(data, &jsonData); err != nil {
+		log.Println(err)
+	}
+	// Append the new log entry to the slice
+	jsonData = append(jsonData, *logger)
+	// Marshal the updated slice back into JSON
+	fileData, err := json.Marshal(jsonData)
+	if err != nil {
+		log.Println(err)
+	}
+	// Truncate the file to clear existing content
+	file.Truncate(0)
+	// Seek to the beginning of the file
+	file.Seek(0, 0)
+	// Write the updated JSON data to the file
+	file.Write(fileData)
+
+}
+func appendToDB() {
+	//TODO
+}
 
 func (l *Logger) SetUser(userID string) *Logger {
 	l.UserID = userID
@@ -90,6 +131,7 @@ func (l *Logger) Debug(endpoint, message string, data ...interface{}) {
 	l.Message = message
 	l.Context = data
 	fmt.Println(messageMaker(l))
+	appendToFile(l)
 }
 func (l *Logger) Info(endpoint, message string, data ...interface{}) {
 	l.ID = uuid.New().String()
@@ -98,6 +140,7 @@ func (l *Logger) Info(endpoint, message string, data ...interface{}) {
 	l.Message = message
 	l.Context = data
 	fmt.Println(messageMaker(l))
+	appendToFile(l)
 }
 func (l *Logger) Warning(endpoint, message string, data ...interface{}) {
 	l.ID = uuid.New().String()
@@ -106,6 +149,7 @@ func (l *Logger) Warning(endpoint, message string, data ...interface{}) {
 	l.Message = message
 	l.Context = data
 	fmt.Println(messageMaker(l))
+	appendToFile(l)
 }
 func (l *Logger) Error(endpoint, message string, data ...interface{}) {
 	l.ID = uuid.New().String()
@@ -114,6 +158,7 @@ func (l *Logger) Error(endpoint, message string, data ...interface{}) {
 	l.Message = message
 	l.Context = data
 	fmt.Println(messageMaker(l))
+	appendToFile(l)
 }
 func (l *Logger) Fatal(endpoint, message string, data ...interface{}) {
 	l.ID = uuid.New().String()
@@ -122,4 +167,5 @@ func (l *Logger) Fatal(endpoint, message string, data ...interface{}) {
 	l.Message = message
 	l.Context = data
 	fmt.Println(messageMaker(l))
+	appendToFile(l)
 }
