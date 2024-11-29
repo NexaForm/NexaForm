@@ -9,12 +9,14 @@ import (
 	"strings"
 	"time"
 
+	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 )
 
 type Logger struct {
 	ID        string        `json:"id"`
 	Timestamp time.Time     `json:"timestamp"`
+	Ip        string        `json:"ip"`
 	Level     Level         `json:"level"`
 	Service   string        `json:"service"`
 	Endpoint  string        `json:"endpoint"`
@@ -61,20 +63,26 @@ func messageMaker(l *Logger) string {
 	}
 	var logMessage strings.Builder
 	logMessage.WriteString(color[l.Level] + "\n======> " + string(l.Level) + " <======\n" + reset)
-	currentTime := time.Now().UTC()
-	isoTimeStr := currentTime.Format(time.RFC3339)
-	logMessage.WriteString(isoTimeStr)
-	logMessage.WriteString(" " + l.Service)
+	currentTime := time.Now().UTC().Format(time.RFC3339)
+	logMessage.WriteString(currentTime)
+	logMessage.WriteString("  " + l.Service)
 	if l.UserID != "" {
-		logMessage.WriteString(" " + l.UserID)
+		logMessage.WriteString("  " + l.UserID)
 	}
-	logMessage.WriteString(" " + l.Endpoint + ":\n" + color[l.Level] + l.Message + reset + "\n")
+	if l.Ip != "" {
+		logMessage.WriteString("  " + l.Ip)
+	}
+	logMessage.WriteString("  " + l.Endpoint + ":\n" + color[l.Level] + l.Message + reset + "\n\n")
 	if len(l.Context) > 0 {
-		for i, d := range l.Context {
-			logMessage.WriteString(fmt.Sprintf("\n%d : %v\n", i, d))
+		for i, c := range l.Context {
+			if i == 0 {
+				logMessage.WriteString(fmt.Sprintf("\t%s: %v\n", "Request", c))
+			} else if i == 1 {
+				logMessage.WriteString(fmt.Sprintf("\t%s: %v\n", "Response", c))
+			}
 		}
 	}
-	logMessage.WriteString(magenta + "ID: " + l.ID + reset)
+	logMessage.WriteString("\n\n" + magenta + "ID: " + l.ID + reset)
 	logMessage.WriteString(color[l.Level] + "\n======> END <======\n" + reset)
 
 	return logMessage.String()
@@ -120,52 +128,48 @@ func appendToDB() {
 	//TODO
 }
 
-func (l *Logger) SetUser(userID string) *Logger {
-	l.UserID = userID
+func (l *Logger) SetContext(ctx *fiber.Ctx) *Logger {
+	if id := ctx.UserContext().Value("id"); id != nil {
+		l.UserID = id.(string)
+	}
+	l.Endpoint = ctx.Path()
+	l.Ip = ctx.IP()
+	l.Context = append(l.Context, ctx.Context().Request.Body())
+	l.Context = append(l.Context, ctx.Context().Response.Body())
 	return l
 }
-func (l *Logger) Debug(endpoint, message string, data ...interface{}) {
+func (l *Logger) Debug(message string) {
 	l.ID = uuid.New().String()
 	l.Level = _DEBUG
-	l.Endpoint = endpoint
 	l.Message = message
-	l.Context = data
 	fmt.Println(messageMaker(l))
 	appendToFile(l)
 }
-func (l *Logger) Info(endpoint, message string, data ...interface{}) {
+func (l *Logger) Info(message string) {
 	l.ID = uuid.New().String()
 	l.Level = _INFO
-	l.Endpoint = endpoint
 	l.Message = message
-	l.Context = data
 	fmt.Println(messageMaker(l))
 	appendToFile(l)
 }
-func (l *Logger) Warning(endpoint, message string, data ...interface{}) {
+func (l *Logger) Warning(message string) {
 	l.ID = uuid.New().String()
 	l.Level = _WARNING
-	l.Endpoint = endpoint
 	l.Message = message
-	l.Context = data
 	fmt.Println(messageMaker(l))
 	appendToFile(l)
 }
-func (l *Logger) Error(endpoint, message string, data ...interface{}) {
+func (l *Logger) Error(message string) {
 	l.ID = uuid.New().String()
 	l.Level = _ERROR
-	l.Endpoint = endpoint
 	l.Message = message
-	l.Context = data
 	fmt.Println(messageMaker(l))
 	appendToFile(l)
 }
-func (l *Logger) Fatal(endpoint, message string, data ...interface{}) {
+func (l *Logger) Fatal(message string) {
 	l.ID = uuid.New().String()
 	l.Level = _FATAL
-	l.Endpoint = endpoint
 	l.Message = message
-	l.Context = data
 	fmt.Println(messageMaker(l))
 	appendToFile(l)
 }
