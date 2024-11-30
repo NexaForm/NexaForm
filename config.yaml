@@ -1,10 +1,12 @@
+database:
+  user: user
+  pass: secret
+  host: localhost
+  port: 5432
+  db_name: NexaFormDB
+
 server:
   http_port: 8080
-  host: localhost
-
-database:
-  user: myuser
-  pass: mysecretpassword
-  host: dbserver
-  port: 5432
-  db_name: mydatabase
+  token_exp_minutes: 1440
+  refresh_token_exp_minutes: 2880
+  token_secret: "P@$$%Secret6677"
