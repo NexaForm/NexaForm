@@ -32,22 +32,29 @@ func TestValidateNationalCode(t *testing.T) {
 	tests := []struct {
 		code     string
 		expected string
-		err      bool
+		wantErr  bool
 	}{
-		{"1234567890", "1234567890", false},
-		{"12345", "", true},
-		{"98765432101", "", true},
-		{"2260308821", "2260308821", false},
+		{"2260308821", "2260308821", false}, // Valid code
+		{"1234567890", "", true},            // Invalid code
+		{"9876543210", "", true},            // Invalid code
+		{"0000000000", "", true},            // Invalid code
+		{"12345678", "", true},              // Invalid: less than 10 digits
+		{"abc1234567", "", true},            // Invalid: non-digit characters
 	}
 
-	for _, test := range tests {
-		result, err := user.ValidateNationalCode(test.code)
-		if (err != nil) != test.err {
-			t.Errorf("Expected error: %v, got: %v", test.err, err)
-		}
-		if result != test.expected {
-			t.Errorf("For national code %s, expected: %s, got: %s", test.code, test.expected, result)
-		}
+	for _, tt := range tests {
+		t.Run(tt.code, func(t *testing.T) {
+			result, err := user.ValidateNationalCode(tt.code)
+
+			if (err != nil) != tt.wantErr {
+				t.Errorf("ValidateNationalCode() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+
+			if !tt.wantErr && result != tt.expected {
+				t.Errorf("ValidateNationalCode() = %v, want %v", result, tt.expected)
+			}
+		})
 	}
 }
 

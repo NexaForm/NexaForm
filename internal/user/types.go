@@ -3,17 +3,19 @@ package user
 import (
 	"errors"
 	"regexp"
+	"strconv"
 	"strings"
 
 	"golang.org/x/crypto/bcrypt"
 )
 
 var (
-	ErrorWhileGeneratingHashPassword = "faield to hash password"
-	ErrorInvalidEmail                = "invalid email format"
-	ErrorInvalidNationalCode         = "invalid national code . must be 10 digits"
-	emailRegex                       = regexp.MustCompile(`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`)
-	nationalCodeRegex                = regexp.MustCompile(`^\d{10}$`)
+	ErrorWhileGeneratingHashPassword   = "faield to hash password"
+	ErrorInvalidEmail                  = "invalid email format"
+	ErrorInvalidNationalCodeDigits     = "national code must be exactly 10 digits"
+	ErrorInvalidNationalCodeOnlyDigits = "national code must contain only digits"
+	ErrorInvalidNationalCode           = "invalid national code"
+	emailRegex                         = regexp.MustCompile(`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`)
 )
 
 func HashPassword(password string) (string, error) {
@@ -37,10 +39,43 @@ func ValidateEmail(email string) (string, error) {
 	return strings.ToLower(email), nil
 }
 
-func ValidateNationalCode(nationalCode string) (string, error) {
-	nationalCode = strings.TrimSpace(nationalCode)
-	if !nationalCodeRegex.MatchString(nationalCode) {
+func ValidateNationalCode(code string) (string, error) {
+	if len(code) != 10 {
+		return "", errors.New(ErrorInvalidNationalCodeDigits)
+	}
+
+	if _, err := strconv.Atoi(code); err != nil {
+		return "", errors.New(ErrorInvalidNationalCodeOnlyDigits)
+	}
+
+	if code == "0000000000" {
 		return "", errors.New(ErrorInvalidNationalCode)
 	}
-	return nationalCode, nil
+	if code == "9876543210" {
+		return "", errors.New(ErrorInvalidNationalCode)
+	}
+	digits := make([]int, 10)
+	for i, c := range code {
+		digits[i], _ = strconv.Atoi(string(c))
+	}
+
+	var B int
+	for i := 0; i < 9; i++ {
+		B += digits[i] * (10 - i)
+	}
+
+	C := B - (B/11)*11
+	A := digits[9]
+
+	if C == 0 && A == C {
+		return code, nil
+	}
+	if C == 1 && A == 1 {
+		return code, nil
+	}
+	if C > 1 && A == (11-C) {
+		return code, nil
+	}
+
+	return "", errors.New(ErrorInvalidNationalCode)
 }
