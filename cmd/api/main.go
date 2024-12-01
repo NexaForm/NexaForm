@@ -1,7 +1,9 @@
 package main
 
 import (
+	http_server "NexaForm/api/http"
 	"NexaForm/config"
+	"NexaForm/service"
 	"flag"
 	"fmt"
 	"log"
@@ -13,6 +15,11 @@ var configPath = flag.String("c", "", "Pass config file")
 func main() {
 	config := readConfig()
 	fmt.Print(config.Server.Host)
+	app, err := service.NewAppContainer(config)
+	if err != nil {
+		log.Fatal(err)
+	}
+	http_server.Run(config, app)
 }
 
 func readConfig() config.Config {
