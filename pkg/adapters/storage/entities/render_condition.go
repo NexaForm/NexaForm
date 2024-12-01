@@ -4,6 +4,8 @@ import (
 	"time"
 )
 
+// TODO - don't forget to change this entity for setting up your related service
+
 type RenderCondition struct {
 	ID                uint     `gorm:"primaryKey"`
 	TriggerQuestionID uint     `gorm:"not null"`

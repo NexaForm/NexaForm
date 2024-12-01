@@ -19,7 +19,7 @@ const (
 type User struct {
 	ID              uuid.UUID      `gorm:"primaryKey;type:uuid;default:gen_random_uuid()"` // Primary Key
 	Email           string         `gorm:"unique;not null"`                                // Unique, Non-Nullable
-	IsEmailVerified *bool          `gorm:"unique;null"`
+	IsEmailVerified *bool          `gorm:"null"`
 	Password        string         `gorm:"not null"`              // Non-Nullable
 	FullName        *string        `gorm:"null"`                  // Nullable
 	Gender          *GenderType    `gorm:"type:gender_enum;null"` // Reference PostgreSQL ENUM type

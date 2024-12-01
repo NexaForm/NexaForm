@@ -6,6 +6,8 @@ import (
 	"github.com/google/uuid"
 )
 
+// TODO - don't forget to change this entity for setting up your related service
+
 type Option struct {
 	ID         uuid.UUID `gorm:"primaryKey;type:uuid;default:gen_random_uuid()"`
 	QuestionID uuid.UUID `gorm:"not null"`
