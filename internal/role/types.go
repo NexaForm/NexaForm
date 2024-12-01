@@ -8,11 +8,7 @@ import (
 )
 
 var (
-	ErrUserNotFound          = errors.New("user not found")
-	ErrInvalidEmail          = errors.New("invalid email format")
-	ErrInvalidPassword       = errors.New("invalid password format")
-	ErrEmailAlreadyExists    = errors.New("email already exists")
-	ErrInvalidAuthentication = errors.New("email and password doesn't match")
+	ErrRoleAlreadyExists = errors.New("email already exists")
 )
 
 type Repo interface {

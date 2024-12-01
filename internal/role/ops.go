@@ -22,7 +22,7 @@ func (o *Ops) Create(ctx context.Context, role *Role) (*Role, error) {
 	createdRole, err := o.repo.Create(ctx, role)
 	if err != nil {
 		if errors.Is(err, utils.DbErrDuplicateKey) {
-			return nil, ErrEmailAlreadyExists
+			return nil, ErrRoleAlreadyExists
 		}
 		return nil, err
 	}
