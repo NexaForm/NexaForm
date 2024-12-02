@@ -13,6 +13,7 @@ import (
 var configPath = flag.String("c", "", "Pass config file")
 
 func main() {
+
 	config := readConfig()
 	fmt.Print(config.Server.Host)
 	app, err := service.NewAppContainer(config)
