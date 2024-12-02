@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  nexaform-redis:
+    image: redis/redis-stack:latest
+    container_name: nexaform-redis
+    ports:
+      - "8003:8001"
+      - "6380:6379"
+    volumes:
+      - nexaform-redis-volume:/data
+
+  nexaform-db:
+    container_name: nexaform-db
+    image: postgres:latest
+    restart: always
+    volumes:
+      - nexaform-db-volume:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: NexaFormDB
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: secret
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD", "pg_isready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  nexaform-db-volume:
+  nexaform-redis-volume:
