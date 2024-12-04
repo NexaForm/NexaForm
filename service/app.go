@@ -15,6 +15,8 @@ type AppContainer struct {
 	cfg         config.Config
 	dbConn      *gorm.DB
 	authService *AuthService
+
+	userService  *UserService
 }
 
 func NewAppContainer(cfg config.Config) (*AppContainer, error) {
@@ -24,6 +26,8 @@ func NewAppContainer(cfg config.Config) (*AppContainer, error) {
 
 	app.mustInitDB() // Initialize the database and perform migrations
 	app.setAuthService()
+
+	app.setUserService()
 	return app, nil
 }
 
@@ -73,4 +77,18 @@ func (a *AppContainer) setAuthService() {
 }
 func (a *AppContainer) AuthService() *AuthService {
 	return a.authService
+}
+
+
+
+func (a *AppContainer) setUserService() {
+	if a.userService != nil {
+		return
+	}
+
+	a.userService = NewUserService(user.NewOps(storage.NewUserRepo(a.dbConn), storage.NewRoleRepo(a.dbConn)))
+}
+
+func (a *AppContainer) UserService() *UserService {
+	return a.userService
 }

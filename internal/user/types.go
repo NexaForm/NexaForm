@@ -25,6 +25,7 @@ type Repo interface {
 	GetByID(ctx context.Context, id uuid.UUID) (*User, error)
 	GetByEmail(ctx context.Context, email string) (*User, error)
 	ActivateUser(ctx context.Context, email string) (*User, error)
+	GetAllVerifiedUsers(ctx context.Context, limit, offset uint) ([]User, uint, error)
 }
 
 type User struct {
