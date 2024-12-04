@@ -5,6 +5,7 @@ import (
 	"NexaForm/internal/user"
 	"NexaForm/internal/wallet"
 	"NexaForm/pkg/adapters/storage/entities"
+	"NexaForm/pkg/fp"
 )
 
 func WalletEntityToDomain(entity *entities.Wallet) *wallet.Wallet {
@@ -66,7 +67,7 @@ func WalletDomainToEntity(domainWallet *wallet.Wallet) *entities.Wallet {
 	}
 }
 
-func walletDomainToEntity(domainWallet *wallet.Wallet) entities.Wallet {
+func walletDomainToEntity(domainWallet wallet.Wallet) entities.Wallet {
 	user := &entities.User{
 		ID:              domainWallet.User.ID,
 		FullName:        domainWallet.User.FullName,
@@ -84,4 +85,11 @@ func walletDomainToEntity(domainWallet *wallet.Wallet) entities.Wallet {
 		UserID:    domainWallet.User.ID,
 		User:      user,
 	}
+}
+
+func BatchWalletEntityToDomain(entities []entities.Wallet) []wallet.Wallet {
+	return fp.Map(entities, walletEntityToDomain)
+}
+func BatchWalletDomainToEntity(entities []wallet.Wallet) []entities.Wallet {
+	return fp.Map(entities, walletDomainToEntity)
 }

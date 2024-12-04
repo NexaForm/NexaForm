@@ -1,6 +1,7 @@
 package wallet
 
 import (
+	"NexaForm/pkg/adapters/storage/entities"
 	"context"
 	"fmt"
 	"time"
@@ -85,7 +86,13 @@ func (ops *Ops) TransferFunds(ctx context.Context, senderID uuid.UUID, receiverI
 	return nil
 }
 
-// TODO
-func (ops *Ops) GetTransactionHistory(ctx context.Context, id uuid.UUID) ([]float64, error) {
-	return nil, nil
+func (ops *Ops) GetTransactionHistory(ctx context.Context, id uuid.UUID, pageIndex int, pageSize int) ([]entities.WalletTransaction, error) {
+	if id == uuid.Nil {
+		return nil, fmt.Errorf("invalid wallet ID")
+	}
+	transactions, err := ops.repo.GetTransactionHistory(ctx, id, pageIndex, pageSize)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get transaction history: %w", err)
+	}
+	return transactions, nil
 }

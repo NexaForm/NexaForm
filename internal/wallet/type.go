@@ -2,6 +2,7 @@ package wallet
 
 import (
 	"NexaForm/internal/user"
+	"NexaForm/pkg/adapters/storage/entities"
 	"context"
 	"time"
 
@@ -14,8 +15,7 @@ type Repo interface {
 	GetBalance(ctx context.Context, id uuid.UUID) (float64, error)
 	CreditWallet(ctx context.Context, id uuid.UUID, amount float64) error
 	TransferFunds(ctx context.Context, abount float64, senderID uuid.UUID, receiverID uuid.UUID) error
-	//return slice of transaction
-	GetTransactionHistory(ctx context.Context, id uuid.UUID, pageIndex int, pageSize int) ([]float64, int, float64, error)
+	GetTransactionHistory(ctx context.Context, id uuid.UUID, pageIndex int, pageSize int) ([]entities.WalletTransaction, error)
 }
 
 type Wallet struct {
