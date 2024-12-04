@@ -3,6 +3,7 @@ package service
 import (
 	"NexaForm/config"
 	"NexaForm/internal/otp"
+	"NexaForm/internal/survey"
 	"NexaForm/internal/user"
 	"NexaForm/pkg/adapters/storage"
 	"context"
@@ -12,11 +13,14 @@ import (
 )
 
 type AppContainer struct {
-	cfg         config.Config
-	dbConn      *gorm.DB
-	authService *AuthService
+	cfg           config.Config
+	dbConn        *gorm.DB
+	authService   *AuthService
+	loggerService *LoggerService
+	surveyService *SurveyService
 }
 
+// NewAppContainer initializes the app container with services
 func NewAppContainer(cfg config.Config) (*AppContainer, error) {
 	app := &AppContainer{
 		cfg: cfg,
@@ -24,6 +28,8 @@ func NewAppContainer(cfg config.Config) (*AppContainer, error) {
 
 	app.mustInitDB() // Initialize the database and perform migrations
 	app.setAuthService()
+	app.setLoggerService()
+	app.setSurveyService()
 	return app, nil
 }
 
@@ -31,6 +37,7 @@ func (a *AppContainer) RawRBConnection() *gorm.DB {
 	return a.dbConn
 }
 
+// mustInitDB initializes the database and performs migrations
 func (a *AppContainer) mustInitDB() {
 	if a.dbConn != nil {
 		return
@@ -41,6 +48,7 @@ func (a *AppContainer) mustInitDB() {
 	if err != nil {
 		log.Fatal("Failed to initialize database connection: ", err)
 	}
+	db = db.Debug()
 
 	// Assign the connection to the app container
 	a.dbConn = db
@@ -62,6 +70,8 @@ func (a *AppContainer) mustInitDB() {
 	}
 	log.Println("Database initialized and migrated successfully.")
 }
+
+// setAuthService initializes the AuthService
 func (a *AppContainer) setAuthService() {
 	if a.authService != nil {
 		return
@@ -71,6 +81,38 @@ func (a *AppContainer) setAuthService() {
 		a.cfg.Server.TokenExpMinutes,
 		a.cfg.Server.RefreshTokenExpMinutes)
 }
+
+// AuthService returns the AuthService instance
 func (a *AppContainer) AuthService() *AuthService {
 	return a.authService
+}
+
+// setLoggerService initializes the LoggerService using the logging configuration
+func (a *AppContainer) setLoggerService() {
+	if a.loggerService != nil {
+		return
+	}
+
+	loggingConfig := a.cfg.Logging.Loggers // Retrieve array of logger configs
+	loggerService, err := NewLoggerService(loggingConfig, a.cfg.Logging.LokiURL)
+	if err != nil {
+		log.Fatalf("Failed to initialize LoggerService: %v", err)
+	}
+
+	a.loggerService = loggerService
+	log.Println("LoggerService initialized successfully.")
+}
+
+// LoggerService returns the LoggerService instance
+func (a *AppContainer) LoggerService() *LoggerService {
+	return a.loggerService
+}
+func (a *AppContainer) setSurveyService() {
+	if a.surveyService != nil {
+		return
+	}
+	a.surveyService = NewSurveyService(survey.NewOps(storage.NewSurveyRepo(a.dbConn)))
+}
+func (a *AppContainer) SurveyService() *SurveyService {
+	return a.surveyService
 }

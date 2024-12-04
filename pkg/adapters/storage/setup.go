@@ -31,6 +31,30 @@ func CreateGenderEnum(db *gorm.DB) error {
 	`
 	return db.Exec(sql).Error
 }
+
+// CreateVisibilityEnum checks and creates the enum type for visibility if it doesn't already exist
+func CreateVisibilityEnum(db *gorm.DB) error {
+	sql := `
+	DO $$ BEGIN
+		IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'visibility_enum') THEN
+			CREATE TYPE visibility_enum AS ENUM ('All', 'Owner_Admin', 'No_One');
+		END IF;
+	END $$;
+	`
+	return db.Exec(sql).Error
+}
+
+// QuestionTypeEnum checks and creates the enum type for question type if it doesn't already exist
+func CreateQuestionTypeEnum(db *gorm.DB) error {
+	sql := `
+	DO $$ BEGIN
+		IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'question_type_enum') THEN
+			CREATE TYPE question_type_enum AS ENUM ('Poll', 'Text', 'Quiz');
+		END IF;
+	END $$;
+	`
+	return db.Exec(sql).Error
+}
 func Seed(ctx context.Context, db *gorm.DB) error {
 	return db.WithContext(ctx).FirstOrCreate(&entities.Role{
 		ID:   uuid.MustParse("11111111-1111-1111-1111-111111111111"),
@@ -43,6 +67,14 @@ func Migrate(db *gorm.DB) error {
 	// Create the gender_enum type
 	if err := CreateGenderEnum(db); err != nil {
 		return fmt.Errorf("failed to create gender_enum type: %w", err)
+	}
+	// Create the visibility_enum type
+	if err := CreateVisibilityEnum(db); err != nil {
+		return fmt.Errorf("failed to create visibility_enum type: %w", err)
+	}
+	// Create the question_type_enum type
+	if err := CreateQuestionTypeEnum(db); err != nil {
+		return fmt.Errorf("failed to create visibility_enum type: %w", err)
 	}
 	return db.AutoMigrate(
 		&entities.User{},
