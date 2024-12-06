@@ -25,3 +25,7 @@ func (s *UserService) GetAllVerifiedUsers(ctx context.Context, userID uuid.UUID,
 
 	return s.userOps.GetAllVerifiedUsers(ctx, page, pageSize)
 }
+
+func (s *UserService) UpdateUser(ctx context.Context, user *user.User) (*user.User, error) {
+	return s.userOps.UpdateUser(ctx, user)
+}
