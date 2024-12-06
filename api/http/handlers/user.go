@@ -50,7 +50,7 @@ func UpdateUser(userService *service.UserService) fiber.Handler {
 		}
 
 		req.ID = userClaims.UserID
-		updatedUser, err := userService.Update(c.UserContext(), &req)
+		updatedUser, err := userService.UpdateUser(c.UserContext(), &req)
 		if err != nil {
 			status := fiber.StatusInternalServerError
 			if errors.Is(err, user.ErrUserNotFound) {

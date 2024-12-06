@@ -110,7 +110,7 @@ func (r *userRepo) GetAllVerifiedUsers(ctx context.Context, limit, offset uint) 
 	return domainUsers, uint(total), nil
 }
 
-func (r *userRepo) Update(ctx context.Context, user *user.User) (*user.User, error) {
+func (r *userRepo) UpdateUser(ctx context.Context, user *user.User) (*user.User, error) {
 	var existingUser entities.User
 	if err := r.db.WithContext(ctx).First(&existingUser, "id = ?", user.ID).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {

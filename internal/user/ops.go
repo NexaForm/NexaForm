@@ -142,7 +142,7 @@ func (o *Ops) UpdateUser(ctx context.Context, user *User) (*User, error) {
 
 	user.Email = LowerCaseEmail(user.Email)
 
-	updatedUser, err := o.repo.Update(ctx, user)
+	updatedUser, err := o.repo.UpdateUser(ctx, user)
 	if err != nil {
 		return nil, err
 	}
