@@ -11,9 +11,9 @@ import (
 
 type Repo interface {
 	Create(ctx context.Context, wallet *Wallet) (*Wallet, error)
-	GetByID(ctx context.Context, id uuid.UUID) (*Wallet, error)
+	GetByUserID(ctx context.Context, id uuid.UUID) (*Wallet, error)
 	GetBalance(ctx context.Context, id uuid.UUID) (float64, error)
-	CreditWallet(ctx context.Context, id uuid.UUID, amount float64) error
+	Deposit(ctx context.Context, id uuid.UUID, amount float64) error
 	TransferFunds(ctx context.Context, abount float64, senderID uuid.UUID, receiverID uuid.UUID) error
 	GetTransactionHistory(ctx context.Context, id uuid.UUID, pageIndex int, pageSize int) ([]entities.WalletTransaction, error)
 }

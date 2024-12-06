@@ -38,11 +38,11 @@ func (ops *Ops) Create(ctx context.Context, wallet *Wallet) (*Wallet, error) {
 
 	return ops.repo.Create(ctx, wallet)
 }
-func (ops *Ops) GetByID(ctx context.Context, id uuid.UUID) (*Wallet, error) {
+func (ops *Ops) GetByUserID(ctx context.Context, id uuid.UUID) (*Wallet, error) {
 	if id == uuid.Nil {
 		return nil, fmt.Errorf("invalid wallet ID")
 	}
-	wallet, err := ops.GetByID(ctx, id)
+	wallet, err := ops.GetByUserID(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -58,14 +58,14 @@ func (ops *Ops) GetBalance(ctx context.Context, id uuid.UUID) (float64, error) {
 	}
 	return amount, nil
 }
-func (ops *Ops) CreditWallet(ctx context.Context, id uuid.UUID, amount float64) error {
+func (ops *Ops) Deposit(ctx context.Context, id uuid.UUID, amount float64) error {
 	if amount < 0 {
 		return fmt.Errorf("amount cannot be negative")
 	}
 	if id == uuid.Nil {
 		return fmt.Errorf("invalid wallet ID")
 	}
-	if err := ops.CreditWallet(ctx, id, amount); err != nil {
+	if err := ops.Deposit(ctx, id, amount); err != nil {
 		return err
 	}
 	return nil
