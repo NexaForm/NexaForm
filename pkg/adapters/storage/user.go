@@ -81,17 +81,16 @@ func (r *userRepo) ActivateUser(ctx context.Context, email string) (*user.User, 
 	return verifiedUser, nil
 }
 
-func(r *userRepo)GetAllVerifiedUsers(ctx context.Context, limit, offset uint) ([]user.User, uint, error){
+func (r *userRepo) GetAllVerifiedUsers(ctx context.Context, limit, offset uint) ([]user.User, uint, error) {
 	var total int64
 	query := r.db.WithContext(ctx).Model(&entities.User{}).Where("is_email_verified = ?", true)
-
 
 	if err := query.Count(&total).Error; err != nil {
 		return nil, 0, err
 	}
 
 	if offset > 0 {
-		query = query.Offset(int(offset)) 
+		query = query.Offset(int(offset))
 	}
 
 	if limit > 0 {
@@ -109,4 +108,26 @@ func(r *userRepo)GetAllVerifiedUsers(ctx context.Context, limit, offset uint) ([
 
 	domainUsers := mappers.BatchUserEntityToDomain(users)
 	return domainUsers, uint(total), nil
+}
+
+func (r *userRepo) Update(ctx context.Context, user *user.User) (*user.User, error) {
+	var existingUser entities.User
+	if err := r.db.WithContext(ctx).First(&existingUser, "id = ?", user.ID).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, gorm.ErrRecordNotFound
+		}
+		return nil, err
+	}
+
+	existingUser.FullName = user.FullName
+	existingUser.Email = user.Email
+	existingUser.Password = user.Password
+	existingUser.NationalID = user.NationalID
+
+	if err := r.db.WithContext(ctx).Save(&existingUser).Error; err != nil {
+		return nil, err
+	}
+
+	updatedUser := mappers.UserEntityToDomain(&existingUser)
+	return updatedUser, nil
 }
