@@ -20,6 +20,7 @@ func NewOps(repo Repo) *Ops {
 }
 
 func (ops *Ops) Create(ctx context.Context, wallet *Wallet) (*Wallet, error) {
+	// make validate function
 	if wallet == nil {
 		return nil, fmt.Errorf("wallet cannot be nil")
 	}
