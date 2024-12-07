@@ -4,6 +4,7 @@ import (
 	"NexaForm/config"
 	"NexaForm/internal/otp"
 	"NexaForm/internal/user"
+	"NexaForm/internal/wallet"
 	"NexaForm/pkg/adapters/storage"
 	"context"
 	"log"
@@ -12,9 +13,10 @@ import (
 )
 
 type AppContainer struct {
-	cfg         config.Config
-	dbConn      *gorm.DB
-	authService *AuthService
+	cfg           config.Config
+	dbConn        *gorm.DB
+	authService   *AuthService
+	walletService *WalletService
 }
 
 func NewAppContainer(cfg config.Config) (*AppContainer, error) {
@@ -24,6 +26,7 @@ func NewAppContainer(cfg config.Config) (*AppContainer, error) {
 
 	app.mustInitDB() // Initialize the database and perform migrations
 	app.setAuthService()
+	app.setWalletService()
 	return app, nil
 }
 
@@ -73,4 +76,13 @@ func (a *AppContainer) setAuthService() {
 }
 func (a *AppContainer) AuthService() *AuthService {
 	return a.authService
+}
+func (a *AppContainer) setWalletService() {
+	if a.WalletSrvice() != nil {
+		return
+	}
+	a.walletService = NewWalletService(otp.NewOps(storage.NewOtpRepo(a.dbConn)), wallet.NewOps(storage.NewWalletRepo(a.dbConn)))
+}
+func (a *AppContainer) WalletSrvice() *WalletService {
+	return a.walletService
 }
