@@ -26,6 +26,13 @@ const (
 type Repo interface {
 	CreateSurvey(ctx context.Context, survey *Survey) (*Survey, error)
 	GetSurveyByID(ctx context.Context, id uuid.UUID) (*Survey, error)
+	GetQuestionsBySurveyID(ctx context.Context, id uuid.UUID) ([]Question, error)
+	CreateAttachments(ctx context.Context, attachments ...Attachment) error
+	UpdateAttachments(ctx context.Context, attachments ...Attachment) error
+	CreateAnswer(ctx context.Context, answer Answer) (*Answer, error)
+	CheckAnswerExists(ctx context.Context, questionID, userID uuid.UUID) (*Answer, error)
+	GetSurveyByQuestionID(ctx context.Context, questionID uuid.UUID) (*Survey, error)
+	GetAnsweredQuestionsByUser(ctx context.Context, surveyID, userID uuid.UUID) ([]Question, error)
 }
 type Survey struct {
 	ID                 uuid.UUID
@@ -49,15 +56,17 @@ type Survey struct {
 }
 
 type Question struct {
-	ID            uuid.UUID
-	SurveyID      uuid.UUID
-	Description   string
-	Type          QuestionType
-	Order         int
-	IsConditional bool
-	Options       []Option
-	CreatedAt     time.Time
-	UpdatedAt     time.Time
+	ID               uuid.UUID
+	SurveyID         uuid.UUID
+	Description      string
+	Type             QuestionType
+	Order            int
+	IsConditional    bool
+	TargetQuestionID *uuid.UUID
+	Options          []Option
+	Attachments      []Attachment
+	CreatedAt        time.Time
+	UpdatedAt        time.Time
 }
 
 type Option struct {
@@ -67,4 +76,24 @@ type Option struct {
 	IsCorrect  *bool
 	CreatedAt  time.Time
 	UpdatedAt  time.Time
+}
+
+type Attachment struct {
+	ID          uuid.UUID
+	QuestionID  uuid.UUID
+	FilePath    string
+	IsPersisted bool
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+}
+type Answer struct {
+	ID               uuid.UUID
+	QuestionID       uuid.UUID
+	Question         Question
+	UserID           uuid.UUID
+	AnswerText       string
+	SelectedOptionID *uuid.UUID
+	SelectedOption   *Option
+	CreatedAt        time.Time
+	UpdatedAt        time.Time
 }

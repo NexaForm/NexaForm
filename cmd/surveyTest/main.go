@@ -60,7 +60,7 @@ func readConfig() config.Config {
 }
 
 func populateSurveys(ctx context.Context, surveyService *service.SurveyService) error {
-	ownerID := uuid.MustParse("36a5b4ee-0a9b-4e9d-9976-0637e30581b5")
+	ownerID := uuid.MustParse("d73db16f-64e2-4686-833c-07e52a838587")
 	istrue := true
 	newSurvey := &survey.Survey{
 		OwnerID:       ownerID,
@@ -111,7 +111,7 @@ func populateSurveys(ctx context.Context, surveyService *service.SurveyService) 
 }
 
 func fetchAndPrintSurveys(ctx context.Context, surveyService *service.SurveyService) error {
-	fetchedSurvey, err := surveyService.GetSurveyByID(ctx, uuid.MustParse("6cb7ee87-0196-4ced-b04f-0bda8e4abfa1"))
+	fetchedSurvey, err := surveyService.GetSurveyByID(ctx, uuid.MustParse("e15f1b91-edc1-4aab-95e7-b9c9c4d83fb4"))
 	if err != nil {
 		return fmt.Errorf("failed to fetch survey: %w", err)
 	}

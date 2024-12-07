@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
 
 // TODO - don't forget to change this entity for setting up your related service
@@ -16,4 +17,6 @@ type Option struct {
 	IsCorrect  *bool     `gorm:"null"`
 	CreatedAt  time.Time
 	UpdatedAt  time.Time
+	DeletedAt  gorm.DeletedAt `gorm:"index"` // Soft delete support
+
 }

@@ -4,6 +4,7 @@ import (
 	http_server "NexaForm/api/http"
 	"NexaForm/config"
 	"NexaForm/service"
+	"context"
 	"flag"
 	"fmt"
 	"log"
@@ -19,6 +20,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	go func() { app.FileService().ListenForEvents(context.Background()) }()
 	http_server.Run(config, app)
 }
 
