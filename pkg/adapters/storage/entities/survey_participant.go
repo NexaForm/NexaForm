@@ -16,6 +16,7 @@ type SurveyParticipant struct {
 	User         User       `gorm:"foreignKey:UserID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"` // Enforce foreign key
 	SurveyRoleID uuid.UUID  `gorm:"not null"`                                                       // Ensure role linkage
 	SurveyRole   SurveyRole `gorm:"foreignKey:SurveyRoleID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+	IsExposed    bool
 	RoleExpire   time.Time
 	CreatedAt    time.Time
 	UpdatedAt    time.Time
