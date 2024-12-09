@@ -3,6 +3,7 @@ package handlers
 import (
 	presenter "NexaForm/api/http/handlers/presenter"
 	"NexaForm/internal/survey"
+	"NexaForm/internal/user"
 	"NexaForm/pkg/jwt"
 	"NexaForm/service"
 	"errors"
@@ -14,6 +15,10 @@ import (
 
 func AddSurveyHandler(surveyService *service.SurveyService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
+		userClaims, ok := c.Locals(UserClaimKey).(*jwt.UserClaims)
+		if !ok{
+			return SendError(c, errWrongClaimType, fiber.StatusBadRequest)
+		}
 		var req presenter.AddSurveyRequest
 		if err := c.BodyParser(&req); err != nil {
 			return presenter.BadRequest(c, err)
@@ -23,9 +28,15 @@ func AddSurveyHandler(surveyService *service.SurveyService) fiber.Handler {
 			return presenter.BadRequest(c, err)
 		}
 
-		survey := presenter.AddSurveyRequestToSurveyDomain(&req)
-		createdSurvey, err := surveyService.CreateSurvey(c.Context(), survey)
+		surveyObj := presenter.AddSurveyRequestToSurveyDomain(&req)
+		// set ownerID
+		surveyObj.OwnerID = userClaims.UserID
+
+		createdSurvey, err := surveyService.CreateSurvey(c.Context(), surveyObj)
 		if err != nil {
+			if errors.Is(err, user.ErrUserNotFound) || errors.Is(err, service.ErrSurveyCreationLimitReached) || errors.Is(err, survey.ErrTitleEmpty) || errors.Is(err, survey.ErrExceedsMinCharacter){
+				return presenter.BadRequest(c, err)
+			}
 			return presenter.InternalServerError(c, err)
 		}
 		return presenter.Created(c, "Survey created successfully", createdSurvey)

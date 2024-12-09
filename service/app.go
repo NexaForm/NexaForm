@@ -113,7 +113,7 @@ func (a *AppContainer) setSurveyService() {
 	if a.surveyService != nil {
 		return
 	}
-	a.surveyService = NewSurveyService(survey.NewOps(storage.NewSurveyRepo(a.dbConn)))
+	a.surveyService = NewSurveyService(user.NewOps(storage.NewUserRepo(a.dbConn), storage.NewRoleRepo(a.dbConn)),survey.NewOps(storage.NewSurveyRepo(a.dbConn)))
 }
 func (a *AppContainer) SurveyService() *SurveyService {
 	return a.surveyService

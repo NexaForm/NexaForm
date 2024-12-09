@@ -80,3 +80,18 @@ func (r *userRepo) ActivateUser(ctx context.Context, email string) (*user.User, 
 	verifiedUser := mappers.UserEntityToDomain(&user)
 	return verifiedUser, nil
 }
+
+
+func (r *userRepo)	GetUserByIDWithNumberOfHisSurveys(ctx context.Context, id uuid.UUID) (*user.User, int,error){
+	var u entities.User
+
+	err := r.db.WithContext(ctx).Model(&entities.User{}).Preload("Surveys").Where("id = ?", id).First(&u).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil,0, nil
+		}
+		return nil,0, err
+	}
+
+	return mappers.UserFullEntityToDomain(&u), len(u.Surveys), nil
+}

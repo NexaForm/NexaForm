@@ -2,6 +2,7 @@ package service
 
 import (
 	"NexaForm/internal/survey"
+	"NexaForm/internal/user"
 	"context"
 	"errors"
 	"fmt"
@@ -12,19 +13,34 @@ import (
 )
 
 var ErrPreviousQuestionUnanswered = errors.New("you must answer the previous question before proceeding")
+var ErrSurveyCreationLimitReached = errors.New("you can not create new survey due to your limit, please contact admin")
 
 type SurveyService struct {
+	userOps *user.Ops
 	surveyOps *survey.Ops
 }
 
 // NewSurveyService initializes SurveyService and sets up Redis client
-func NewSurveyService(surveyOps *survey.Ops) *SurveyService {
+func NewSurveyService(userOps *user.Ops,surveyOps *survey.Ops) *SurveyService {
 	return &SurveyService{
+		userOps: userOps,
 		surveyOps: surveyOps,
 	}
 }
 
 func (ss *SurveyService) CreateSurvey(ctx context.Context, survey *survey.Survey) (*survey.Survey, error) {
+	// first validation:
+	// check if the logged in user exists and van create survey => so we need userOps
+	user,n ,err := ss.userOps.GetUserByIDWithNumberOfHisSurveys(ctx, survey.OwnerID)
+	if err!=nil{
+		return nil, err // user not found = 90%
+	}
+	// check if he has any limitation to create survey
+	if user.MaxSurveyCount!=nil{
+		if n + 1 > int(*user.MaxSurveyCount){
+			return nil, ErrSurveyCreationLimitReached 
+		}
+	}
 	return ss.surveyOps.Create(ctx, survey)
 }
 

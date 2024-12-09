@@ -3,9 +3,15 @@ package survey
 import (
 	"NexaForm/internal/user"
 	"context"
+	"errors"
 	"time"
 
 	"github.com/google/uuid"
+)
+
+var (
+	ErrTitleEmpty = errors.New("title cannot be empty")
+	ErrExceedsMinCharacter = errors.New("title exceeds maximum length of 255 characters")
 )
 
 type VisibilityType string
@@ -96,4 +102,17 @@ type Answer struct {
 	SelectedOption   *Option
 	CreatedAt        time.Time
 	UpdatedAt        time.Time
+}
+
+/// validations
+
+func validateTitle(title string) error {
+	if title == "" {
+		return ErrTitleEmpty
+	}
+	if len(title) > 255 {
+		return ErrExceedsMinCharacter
+	}
+
+	return nil
 }

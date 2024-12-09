@@ -31,6 +31,7 @@ var (
 type Repo interface {
 	Create(ctx context.Context, user *User) (*User, error)
 	GetByID(ctx context.Context, id uuid.UUID) (*User, error)
+	GetUserByIDWithNumberOfHisSurveys(ctx context.Context, id uuid.UUID) (*User, int,error)
 	GetByEmail(ctx context.Context, email string) (*User, error)
 	ActivateUser(ctx context.Context, email string) (*User, error)
 }
@@ -43,6 +44,8 @@ type User struct {
 	Password     string
 	NationalID   string
 	Role         role.Role
+	MaxSurveyCount  *int64   
+	//Surveys         []survey.Survey         
 }
 
 func (u *User) SetPassword(password string) {

@@ -58,7 +58,25 @@ func (o *Ops) Create(ctx context.Context, user *User) (*User, error) {
 }
 
 func (o *Ops) GetUserByID(ctx context.Context, id uuid.UUID) (*User, error) {
-	return o.repo.GetByID(ctx, id)
+	user, err := o.repo.GetByID(ctx, id)
+	if err!=nil{
+		return nil, err
+	}
+	if user == nil {
+		return nil, ErrUserNotFound
+	}
+	return user, nil
+}
+
+func (o *Ops)GetUserByIDWithNumberOfHisSurveys(ctx context.Context, id uuid.UUID)(*User, int, error){
+	user, numberOfSurveys,err := o.repo.GetUserByIDWithNumberOfHisSurveys(ctx, id)
+	if err!=nil{
+		return nil, 0, err
+	}
+	if user == nil {
+		return nil, 0, ErrUserNotFound
+	}
+	return user, numberOfSurveys,nil
 }
 
 func (o *Ops) GetUserByEmailAndPassword(ctx context.Context, email, password string) (*User, error) {

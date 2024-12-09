@@ -16,9 +16,17 @@ func NewOps(repo Repo) *Ops {
 	}
 }
 
-func (o *Ops) Create(ctx context.Context, user *Survey) (*Survey, error) {
+func (o *Ops) Create(ctx context.Context, s *Survey) (*Survey, error) {
+	// validation for survey creation
+	// check title Validation
+	if err := validateTitle(s.Title); err != nil {
+		return nil, err
+	}
+	// validate start time > end time
 
-	return o.repo.CreateSurvey(ctx, user)
+	// validate start time , endTime > time.Now
+
+	return o.repo.CreateSurvey(ctx, s)
 }
 func (o *Ops) GetByID(ctx context.Context, id uuid.UUID) (*Survey, error) {
 
