@@ -22,6 +22,8 @@ func (o *Ops) Create(ctx context.Context, s *Survey) (*Survey, error) {
 	if err := validateTitle(s.Title); err != nil {
 		return nil, err
 	}
+	// TODo
+	// ParticipationCount>0
 	// validate start time > end time
 
 	// validate start time , endTime > time.Now

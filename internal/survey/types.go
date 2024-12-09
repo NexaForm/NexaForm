@@ -48,8 +48,8 @@ type Survey struct {
 	StartTime          time.Time
 	EndTime            time.Time
 	Visibility         VisibilityType
-	AllowedMinAge      int
-	AllowedMaxAge      int
+	AllowedMinAge      int // todo not negetive
+	AllowedMaxAge      int //
 	AllowedGender      user.GenderType
 	MaxEditTime        time.Time
 	IsOrdered          bool
@@ -64,9 +64,9 @@ type Survey struct {
 type Question struct {
 	ID               uuid.UUID
 	SurveyID         uuid.UUID
-	Description      string
+	Description      string // to do validate
 	Type             QuestionType
-	Order            int
+	Order            int // to do validate: if survey.IsOrdered=true => Order should be 1, 2, 3, 4 ..  len survey.Questions
 	IsConditional    bool
 	TargetQuestionID *uuid.UUID
 	Options          []Option
@@ -78,9 +78,9 @@ type Question struct {
 type Option struct {
 	ID         uuid.UUID
 	QuestionID uuid.UUID
-	Text       string
-	IsCorrect  *bool
-	CreatedAt  time.Time
+	Text       string // validate
+	IsCorrect  *bool 
+	CreatedAt  time.Time 
 	UpdatedAt  time.Time
 }
 
