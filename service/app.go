@@ -13,12 +13,20 @@ import (
 )
 
 type AppContainer struct {
-	cfg           config.Config
-	dbConn        *gorm.DB
-	authService   *AuthService
+
+	cfg         config.Config
+	dbConn      *gorm.DB
+	authService *AuthService
+
+	userService  *UserService
+
+
+
+
 	loggerService *LoggerService
 	surveyService *SurveyService
 	fileService   *FileService
+
 }
 
 // NewAppContainer initializes the app container with services
@@ -29,9 +37,14 @@ func NewAppContainer(cfg config.Config) (*AppContainer, error) {
 
 	app.mustInitDB() // Initialize the database and perform migrations
 	app.setAuthService()
+
+
+	app.setUserService()
+
 	app.setLoggerService()
 	app.setSurveyService()
 	app.setFileService()
+
 	return app, nil
 }
 
@@ -87,6 +100,21 @@ func (a *AppContainer) setAuthService() {
 // AuthService returns the AuthService instance
 func (a *AppContainer) AuthService() *AuthService {
 	return a.authService
+}
+
+
+
+
+func (a *AppContainer) setUserService() {
+	if a.userService != nil {
+		return
+	}
+
+	a.userService = NewUserService(user.NewOps(storage.NewUserRepo(a.dbConn), storage.NewRoleRepo(a.dbConn)))
+}
+
+func (a *AppContainer) UserService() *UserService {
+	return a.userService
 }
 
 // setLoggerService initializes the LoggerService using the logging configuration
@@ -146,3 +174,4 @@ func (a *AppContainer) setFileService() {
 func (a *AppContainer) FileService() *FileService {
 	return a.fileService
 }
+

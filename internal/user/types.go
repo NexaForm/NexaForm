@@ -26,6 +26,7 @@ var (
 	ErrInvalidPassword       = errors.New("invalid password format")
 	ErrEmailAlreadyExists    = errors.New("email already exists")
 	ErrInvalidAuthentication = errors.New("email and password doesn't match")
+	ErrInvalidPayload        = errors.New("required fields are missing, data types are incorrect, or the values do not meet specified constraints")
 )
 
 type Repo interface {
@@ -33,6 +34,8 @@ type Repo interface {
 	GetByID(ctx context.Context, id uuid.UUID) (*User, error)
 	GetByEmail(ctx context.Context, email string) (*User, error)
 	ActivateUser(ctx context.Context, email string) (*User, error)
+	GetAllVerifiedUsers(ctx context.Context, limit, offset uint) ([]User, uint, error)
+	UpdateUser(ctx context.Context, user *User) (*User, error)
 }
 
 type User struct {

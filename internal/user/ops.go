@@ -58,7 +58,16 @@ func (o *Ops) Create(ctx context.Context, user *User) (*User, error) {
 }
 
 func (o *Ops) GetUserByID(ctx context.Context, id uuid.UUID) (*User, error) {
-	return o.repo.GetByID(ctx, id)
+
+	user, err := o.repo.GetByID(ctx, id)
+
+	if err != nil {
+		return nil, err
+	}
+	if user == nil {
+		return nil, ErrUserNotFound
+	}
+	return user, err
 }
 
 func (o *Ops) GetUserByEmailAndPassword(ctx context.Context, email, password string) (*User, error) {
@@ -99,6 +108,13 @@ func (o *Ops) ActivateUser(ctx context.Context, email string) (*User, error) {
 	return user, nil
 }
 
+func (o *Ops) GetAllVerifiedUsers(ctx context.Context, page, pageSize uint) ([]User, uint, error) {
+	limit := pageSize
+	offset := (page - 1) * pageSize
+
+	return o.repo.GetAllVerifiedUsers(ctx, limit, offset)
+}
+
 func validateUserRegistration(user *User) error {
 	err := ValidateEmail(user.Email)
 	if err != nil {
@@ -109,4 +125,27 @@ func validateUserRegistration(user *User) error {
 		return err
 	}
 	return nil
+}
+
+func (o *Ops) UpdateUser(ctx context.Context, user *User) (*User, error) {
+	if err := ValidateEmail(user.Email); err != nil {
+		return nil, err
+	}
+
+	if user.Password != "" {
+		hashedPassword, err := utils.HashPassword(user.Password)
+		if err != nil {
+			return nil, err
+		}
+		user.SetPassword(hashedPassword)
+	}
+
+	user.Email = LowerCaseEmail(user.Email)
+
+	updatedUser, err := o.repo.UpdateUser(ctx, user)
+	if err != nil {
+		return nil, err
+	}
+
+	return updatedUser, nil
 }
