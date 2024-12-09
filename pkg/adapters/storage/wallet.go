@@ -35,9 +35,9 @@ func (r *walletRepo) Create(ctx context.Context, wallet *wallet.Wallet) (*wallet
 	createdWallet := mappers.WalletEntityToDomain(newWallet)
 	return createdWallet, nil
 }
-func (r *walletRepo) GetByUserID(ctx context.Context, id uuid.UUID) (*wallet.Wallet, error) {
+func (r *walletRepo) GetByUserID(ctx context.Context, userID uuid.UUID) (*wallet.Wallet, error) {
 	var w entities.Wallet
-	err := r.db.WithContext(ctx).Model(&wallet.Wallet{}).Where("user_id=?", id).First(&w).Error
+	err := r.db.WithContext(ctx).Model(&wallet.Wallet{}).Where("user_id=?", userID).First(&w).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil

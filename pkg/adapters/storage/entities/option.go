@@ -13,7 +13,7 @@ type Option struct {
 	QuestionID uuid.UUID `gorm:"not null"`
 	Question   Question  `gorm:"foreignKey:QuestionID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
 	Text       string    `gorm:"not null"`
-	IsCorrect  *bool
+	IsCorrect  *bool     `gorm:"null"`
 	CreatedAt  time.Time
 	UpdatedAt  time.Time
 }

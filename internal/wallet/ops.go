@@ -49,13 +49,10 @@ func (ops *Ops) GetByUserID(ctx context.Context, id uuid.UUID) (*Wallet, error) 
 	}
 	return wallet, nil
 }
-func (ops *Ops) GetBalance(ctx context.Context, id uuid.UUID) (float64, error) {
-	if id == uuid.Nil {
-		return 0, fmt.Errorf("invalid wallet ID")
-	}
-	amount, err := ops.GetBalance(ctx, id)
+func (ops *Ops) GetBalance(ctx context.Context, userID uuid.UUID) (*Wallet, error) {
+	amount, err := ops.GetByUserID(ctx, userID)
 	if err != nil {
-		return 0, err
+		return nil, err
 	}
 	return amount, nil
 }
