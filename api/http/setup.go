@@ -24,7 +24,8 @@ func Run(cfg config.Config, app *service.AppContainer) {
 }
 
 func registerGlobalRoutes(router fiber.Router, app *service.AppContainer) {
-	router.Post("/register", handlers.RegisterUser(app.AuthService()))
+	router.Post("/register", handlers.RegisterUser(app.AuthService(), app.LoggerService()))
+
 	router.Post("/register/verify", handlers.VerifyEmail(app.AuthService()))
 	router.Get("/refresh", handlers.RefreshToken(app.AuthService()))
 	router.Post("/login", handlers.LoginUser(app.AuthService()))

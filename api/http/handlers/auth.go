@@ -8,10 +8,12 @@ import (
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
+	"go.uber.org/zap"
 )
 
-func RegisterUser(authService *service.AuthService) fiber.Handler {
+func RegisterUser(authService *service.AuthService, logService *service.LoggerService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
+		
 
 		var req presenter.UserRegisterReq
 
@@ -26,7 +28,15 @@ func RegisterUser(authService *service.AuthService) fiber.Handler {
 		u := presenter.UserRegisterToUserDomain(&req)
 
 		newUser, err := authService.CreateUserAndSentOtp(c.Context(), u)
+		fields := []zap.Field{
+			//zap.String("request_id", randomString(10)),
+			//zap.String("user_id", ran),
+			zap.String("action", "registration"),
+			//zap.String("status", randomStatus()),
+			zap.String("endpoint", "api/v1/register"),
+		}
 		if err != nil {
+			logService.LogError(c.Context(), "userService", "Generated error log", fields...)
 			if errors.Is(err, user.ErrInvalidEmail) || errors.Is(err, user.ErrInvalidPassword) {
 				return presenter.BadRequest(c, err)
 			}
@@ -37,7 +47,7 @@ func RegisterUser(authService *service.AuthService) fiber.Handler {
 			return presenter.InternalServerError(c, err)
 		}
 
-		return presenter.Created(c, "otp code successfuly generated", fiber.Map{
+		return presenter.Created(c, "otp code successfully generated", fiber.Map{
 			"user_id": newUser.ID,
 		})
 	}
