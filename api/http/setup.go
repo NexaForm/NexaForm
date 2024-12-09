@@ -14,21 +14,12 @@ import (
 func Run(cfg config.Config, app *service.AppContainer) {
 	fiberApp := fiber.New(fiber.Config{})
 	secret := []byte(cfg.Server.TokenSecret)
-<<<<<<< HEAD
-
-	api := fiberApp.Group("/api/v1")
-
-	// register global routes
-	//
-	registerGlobalRoutes(api, app)
-	registerWalletRoutees(api, app, secret)
-=======
 	api := fiberApp.Group("/api/v1")
 
 	// register routes
 	registerGlobalRoutes(api, app)
 	registerSurveyRoutes(api, app, secret)
->>>>>>> dev
+	registerWalletRoutees(api, app, secret)
 
 	log.Fatal(fiberApp.Listen(fmt.Sprintf("%s:%d", cfg.Server.Host, cfg.Server.HTTPPort)))
 }
