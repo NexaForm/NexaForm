@@ -15,6 +15,7 @@ func Run(cfg config.Config, app *service.AppContainer) {
 	fiberApp := fiber.New(fiber.Config{})
 	secret := []byte(cfg.Server.TokenSecret)
 	api := fiberApp.Group("/api/v1")
+	fiberApp.Use(middlewares.LoggerMiddleware(app.LoggerService(), service.ServiceAPI))
 
 	// register routes
 	registerGlobalRoutes(api, app)
