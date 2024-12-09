@@ -3,9 +3,15 @@ package survey
 import (
 	"NexaForm/internal/user"
 	"context"
+	"errors"
 	"time"
 
 	"github.com/google/uuid"
+)
+
+var (
+	ErrTitleEmpty = errors.New("title cannot be empty")
+	ErrExceedsMinCharacter = errors.New("title exceeds maximum length of 255 characters")
 )
 
 type VisibilityType string
@@ -42,8 +48,8 @@ type Survey struct {
 	StartTime          time.Time
 	EndTime            time.Time
 	Visibility         VisibilityType
-	AllowedMinAge      int
-	AllowedMaxAge      int
+	AllowedMinAge      int // todo not negetive
+	AllowedMaxAge      int //
 	AllowedGender      user.GenderType
 	MaxEditTime        time.Time
 	IsOrdered          bool
@@ -58,9 +64,9 @@ type Survey struct {
 type Question struct {
 	ID               uuid.UUID
 	SurveyID         uuid.UUID
-	Description      string
+	Description      string // to do validate
 	Type             QuestionType
-	Order            int
+	Order            int // to do validate: if survey.IsOrdered=true => Order should be 1, 2, 3, 4 ..  len survey.Questions
 	IsConditional    bool
 	TargetQuestionID *uuid.UUID
 	Options          []Option
@@ -72,9 +78,9 @@ type Question struct {
 type Option struct {
 	ID         uuid.UUID
 	QuestionID uuid.UUID
-	Text       string
-	IsCorrect  *bool
-	CreatedAt  time.Time
+	Text       string // validate
+	IsCorrect  *bool 
+	CreatedAt  time.Time 
 	UpdatedAt  time.Time
 }
 
@@ -96,4 +102,17 @@ type Answer struct {
 	SelectedOption   *Option
 	CreatedAt        time.Time
 	UpdatedAt        time.Time
+}
+
+/// validations
+
+func validateTitle(title string) error {
+	if title == "" {
+		return ErrTitleEmpty
+	}
+	if len(title) > 255 {
+		return ErrExceedsMinCharacter
+	}
+
+	return nil
 }
