@@ -12,6 +12,14 @@ import (
 	"github.com/google/uuid"
 )
 
+// GenderType defines valid gender values
+type GenderType string
+
+const (
+	Male   GenderType = "Male"
+	Female GenderType = "Female"
+)
+
 var (
 	ErrUserNotFound          = errors.New("user not found")
 	ErrInvalidEmail          = errors.New("invalid email format")

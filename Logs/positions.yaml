@@ -1,0 +1,6 @@
+positions:
+  /var/log/my-service/api.log: "609271"
+  /var/log/my-service/auth.log: "600842"
+  /var/log/my-service/database.log: "624178"
+  /var/log/my-service/logger.log: "572962"
+  /var/log/my-service/user.log: "598085"

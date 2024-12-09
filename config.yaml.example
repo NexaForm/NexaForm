@@ -1,0 +1,52 @@
+database:
+  user: user
+  pass: secret
+  host: localhost
+  port: 5432
+  db_name: NexaFormDB
+
+server:
+  http_port: 8080
+  token_exp_minutes: 1440
+  refresh_token_exp_minutes: 2880
+  token_secret: "P@$$%Secret6677"
+
+logging:
+  loki_url: "http://localhost:3100"       # Loki URL for sending logs
+  loggers:
+    - name: "auth"
+      log_file_path: "./Logs/auth.log"
+      max_size: 1
+      max_backups: 5
+      max_age: 30
+      compress: true
+      level: "debug"
+    - name: "database"
+      log_file_path: "./Logs/database.log"
+      max_size: 1
+      max_backups: 5
+      max_age: 30
+      compress: true
+      level: "debug"
+    - name: "api"
+      log_file_path: "./Logs/api.log"
+      max_size: 1
+      max_backups: 5
+      max_age: 30
+      compress: true
+      level: "debug"
+    - name: "logger"
+      log_file_path: "./Logs/logger.log"
+      max_size: 1
+      max_backups: 5
+      max_age: 30
+      compress: true
+      level: "debug"
+    - name: "user"
+      log_file_path: "./Logs/user.log"
+      max_size: 1
+      max_backups: 5
+      max_age: 30
+      compress: true
+      level: "debug"
+
