@@ -118,11 +118,20 @@ func (r *userRepo) UpdateUser(ctx context.Context, user *user.User) (*user.User,
 		}
 		return nil, err
 	}
+	if user.FullName != "" {
+		existingUser.FullName = user.FullName
 
-	existingUser.FullName = user.FullName
-	existingUser.Email = user.Email
-	existingUser.Password = user.Password
-	existingUser.NationalID = user.NationalID
+	}
+	if user.Email != "" {
+		existingUser.Email = user.Email
+	}
+	if user.Password != "" {
+		existingUser.Password = user.Password
+	}
+	if user.NationalID != "" {
+		existingUser.NationalID = user.NationalID
+
+	}
 
 	if err := r.db.WithContext(ctx).Save(&existingUser).Error; err != nil {
 		return nil, err
