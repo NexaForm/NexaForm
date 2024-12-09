@@ -20,6 +20,7 @@ type AppContainer struct {
 	walletService *WalletService
 	loggerService *LoggerService
 	surveyService *SurveyService
+	fileService   *FileService
 }
 
 // NewAppContainer initializes the app container with services
@@ -33,6 +34,7 @@ func NewAppContainer(cfg config.Config) (*AppContainer, error) {
 	app.setWalletService()
 	app.setLoggerService()
 	app.setSurveyService()
+	app.setFileService()
 	return app, nil
 }
 
@@ -132,4 +134,32 @@ func (a *AppContainer) setSurveyService() {
 }
 func (a *AppContainer) SurveyService() *SurveyService {
 	return a.surveyService
+}
+
+// setFileService initializes the FileService
+func (a *AppContainer) setFileService() {
+	if a.fileService != nil {
+		return
+	}
+
+	fileService, err := NewFileService(
+		survey.NewOps(storage.NewSurveyRepo(a.dbConn)),
+		"localhost:9000", // Endpoint
+		"minioadmin",     // Access Key
+		"minioadmin",     // Secret Key
+		"attachments",    // Bucket Name (can be customized)
+		false,            // Use SSL (false for local setup)
+	)
+
+	if err != nil {
+		log.Fatalf("Failed to initialize FileService: %v", err)
+	}
+
+	a.fileService = fileService
+	log.Println("FileService initialized successfully.")
+}
+
+// FileService returns the FileService instance
+func (a *AppContainer) FileService() *FileService {
+	return a.fileService
 }

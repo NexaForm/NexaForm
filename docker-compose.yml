@@ -71,7 +71,7 @@ services:
       - loki
     networks:
       - nexaform-network
-      
+
   minio:
     image: quay.io/minio/minio
     container_name: nexaform-minio
@@ -82,11 +82,18 @@ services:
     environment:
       MINIO_ROOT_USER: minioadmin
       MINIO_ROOT_PASSWORD: minioadmin
+      MINIO_NOTIFY_REDIS_ENABLE_PRIMARY: "on"
+      MINIO_NOTIFY_REDIS_ADDRESS_PRIMARY: "nexaform-redis:6379"
+      MINIO_NOTIFY_REDIS_KEY_PRIMARY: "bucketevents"
+      MINIO_NOTIFY_REDIS_FORMAT_PRIMARY: "namespace"
     volumes:
       - minio-data:/data
     command: server /data --console-address ":9001"
     networks:
       - nexaform-network
+    depends_on:
+      - nexaform-redis
+
 
 volumes:
   nexaform-db-volume:

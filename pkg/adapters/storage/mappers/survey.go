@@ -52,28 +52,32 @@ func SurveyDomainToEntity(domain *survey.Survey) *entities.Survey {
 // question mappers
 func QuestionEntityToDomain(entity *entities.Question) *survey.Question {
 	return &survey.Question{
-		ID:            entity.ID,
-		SurveyID:      entity.SurveyID,
-		Description:   entity.Description,
-		Type:          entity.Type,
-		Order:         entity.Order,
-		IsConditional: entity.IsConditional,
-		Options:       BatchOptionEntityToDomain(entity.Options),
-		CreatedAt:     entity.CreatedAt,
-		UpdatedAt:     entity.UpdatedAt,
+		ID:               entity.ID,
+		SurveyID:         entity.SurveyID,
+		Description:      entity.Description,
+		Type:             entity.Type,
+		Order:            entity.Order,
+		IsConditional:    entity.IsConditional,
+		TargetQuestionID: entity.TargetQuestionID,
+		Options:          BatchOptionEntityToDomain(entity.Options),
+		Attachments:      BatchAttachmentEntityToDomain(entity.Attachments),
+		CreatedAt:        entity.CreatedAt,
+		UpdatedAt:        entity.UpdatedAt,
 	}
 }
 func questionEntityToDomain(entity entities.Question) survey.Question {
 	return survey.Question{
-		ID:            entity.ID,
-		SurveyID:      entity.ID,
-		Description:   entity.Description,
-		Type:          entity.Type,
-		Order:         entity.Order,
-		IsConditional: entity.IsConditional,
-		Options:       BatchOptionEntityToDomain(entity.Options),
-		CreatedAt:     entity.CreatedAt,
-		UpdatedAt:     entity.UpdatedAt,
+		ID:               entity.ID,
+		SurveyID:         entity.SurveyID,
+		Description:      entity.Description,
+		Type:             entity.Type,
+		Order:            entity.Order,
+		IsConditional:    entity.IsConditional,
+		TargetQuestionID: entity.TargetQuestionID,
+		Options:          BatchOptionEntityToDomain(entity.Options),
+		Attachments:      BatchAttachmentEntityToDomain(entity.Attachments),
+		CreatedAt:        entity.CreatedAt,
+		UpdatedAt:        entity.UpdatedAt,
 	}
 }
 func BatchQuestionEntityToDomain(entities []entities.Question) []survey.Question {
@@ -81,22 +85,26 @@ func BatchQuestionEntityToDomain(entities []entities.Question) []survey.Question
 }
 func QuestionDomainToEntity(domain *survey.Question) *entities.Question {
 	return &entities.Question{
-		SurveyID:      domain.SurveyID,
-		Description:   domain.Description,
-		IsConditional: domain.IsConditional,
-		Options:       BatchOptionDomainToEntity(domain.Options),
-		Type:          domain.Type,
-		Order:         domain.Order,
+		SurveyID:         domain.SurveyID,
+		Description:      domain.Description,
+		IsConditional:    domain.IsConditional,
+		TargetQuestionID: domain.TargetQuestionID,
+		Options:          BatchOptionDomainToEntity(domain.Options),
+		Attachments:      BatchAttachmentDomainToEntity(domain.Attachments),
+		Type:             domain.Type,
+		Order:            domain.Order,
 	}
 }
 func questionDomainToEntity(domain survey.Question) entities.Question {
 	return entities.Question{
-		SurveyID:      domain.SurveyID,
-		Description:   domain.Description,
-		Type:          domain.Type,
-		Order:         domain.Order,
-		IsConditional: domain.IsConditional,
-		Options:       BatchOptionDomainToEntity(domain.Options),
+		SurveyID:         domain.SurveyID,
+		Description:      domain.Description,
+		Type:             domain.Type,
+		Order:            domain.Order,
+		IsConditional:    domain.IsConditional,
+		TargetQuestionID: domain.TargetQuestionID,
+		Options:          BatchOptionDomainToEntity(domain.Options),
+		Attachments:      BatchAttachmentDomainToEntity(domain.Attachments),
 	}
 }
 func BatchQuestionDomainToEntity(domains []survey.Question) []entities.Question {
@@ -143,4 +151,99 @@ func optionDomainToEntity(domain survey.Option) entities.Option {
 }
 func BatchOptionDomainToEntity(options []survey.Option) []entities.Option {
 	return fp.Map(options, optionDomainToEntity)
+}
+
+// attachment mapper
+func AttachmentEntityToDomain(entity *entities.Attachment) *survey.Attachment {
+	return &survey.Attachment{
+		ID:          entity.ID,
+		QuestionID:  entity.QuestionID,
+		FilePath:    entity.FilePath,
+		IsPersisted: entity.IsPersisted,
+		CreatedAt:   entity.CreatedAt,
+		UpdatedAt:   entity.UpdatedAt,
+	}
+}
+
+func AttachmentDomainToEntity(domain *survey.Attachment) *entities.Attachment {
+	return &entities.Attachment{
+		QuestionID: domain.QuestionID,
+		FilePath:   domain.FilePath,
+	}
+}
+func attachmentEntityToDomain(entity entities.Attachment) survey.Attachment {
+	return survey.Attachment{
+		ID:          entity.ID,
+		QuestionID:  entity.QuestionID,
+		FilePath:    entity.FilePath,
+		IsPersisted: entity.IsPersisted,
+		CreatedAt:   entity.CreatedAt,
+		UpdatedAt:   entity.UpdatedAt,
+	}
+}
+
+func attachmentDomainToEntity(domain survey.Attachment) entities.Attachment {
+	return entities.Attachment{
+		QuestionID:  domain.QuestionID,
+		FilePath:    domain.FilePath,
+		IsPersisted: domain.IsPersisted,
+	}
+}
+
+func BatchAttachmentEntityToDomain(entities []entities.Attachment) []survey.Attachment {
+	return fp.Map(entities, attachmentEntityToDomain)
+}
+
+func BatchAttachmentDomainToEntity(domains []survey.Attachment) []entities.Attachment {
+	return fp.Map(domains, attachmentDomainToEntity)
+}
+
+// answer mapper
+func AnswerEntityToDomain(entity *entities.Answer) *survey.Answer {
+	return &survey.Answer{
+		ID:               entity.ID,
+		QuestionID:       entity.QuestionID,
+		UserID:           entity.UserID,
+		AnswerText:       entity.AnswerText,
+		SelectedOptionID: entity.SelectedOptionID,
+		CreatedAt:        entity.CreatedAt,
+		UpdatedAt:        entity.UpdatedAt,
+	}
+}
+
+func AnswerDomainToEntity(domain *survey.Answer) *entities.Answer {
+	return &entities.Answer{
+		QuestionID:       domain.QuestionID,
+		UserID:           domain.UserID,
+		AnswerText:       domain.AnswerText,
+		SelectedOptionID: domain.SelectedOptionID,
+	}
+}
+func answerEntityToDomain(entity entities.Answer) survey.Answer {
+	return survey.Answer{
+		ID:               entity.ID,
+		QuestionID:       entity.QuestionID,
+		UserID:           entity.UserID,
+		AnswerText:       entity.AnswerText,
+		SelectedOptionID: entity.SelectedOptionID,
+		CreatedAt:        entity.CreatedAt,
+		UpdatedAt:        entity.UpdatedAt,
+	}
+}
+
+func answerDomainToEntity(domain survey.Answer) entities.Answer {
+	return entities.Answer{
+		QuestionID:       domain.ID,
+		UserID:           domain.UserID,
+		AnswerText:       domain.AnswerText,
+		SelectedOptionID: domain.SelectedOptionID,
+	}
+}
+
+func BatchAnswerEntityToDomain(entities []entities.Answer) []survey.Answer {
+	return fp.Map(entities, answerEntityToDomain)
+}
+
+func BatchAnswerDomainToEntity(domains []survey.Answer) []entities.Answer {
+	return fp.Map(domains, answerDomainToEntity)
 }
