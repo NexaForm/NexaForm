@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
 	"net/url"
 	"strings"
 	"time"
@@ -140,14 +139,13 @@ func (fs *FileService) ListenForEvents(ctx context.Context) {
 	logger := fs.loggerService
 	defer logger.Sync()
 	redisKey := "bucketevents"
-	log.Printf("Listening for events in Redis hash key: %s\n", redisKey)
+	logger.LogInfo(ctx, ServiceLogger, fmt.Sprintf("Listening for events in Redis hash key: %s\n", redisKey))
 
 	for {
 		// Fetch all entries in the Redis hash key
 		events, err := fs.redisClient.HGetAll(ctx, redisKey).Result()
 		if err != nil {
 			logger.LogError(ctx, ServiceLogger, err.Error())
-			log.Printf("Error fetching events from Redis: %v", err)
 			time.Sleep(5 * time.Second)
 			continue
 		}
@@ -166,11 +164,9 @@ func (fs *FileService) ListenForEvents(ctx context.Context) {
 
 			if err := json.Unmarshal([]byte(value), &event); err != nil {
 				logger.LogError(ctx, ServiceLogger, err.Error())
-				log.Printf("Error decoding event for key %s: %v", key, err)
 				continue
 			}
 			logger.LogInfo(ctx, ServiceLogger, fmt.Sprintf("Processing event for key: %s", key))
-			log.Printf("Processing event for key: %s", key)
 
 			for _, record := range event.Records {
 				filePath := record.S3.Object.Key
@@ -179,7 +175,6 @@ func (fs *FileService) ListenForEvents(ctx context.Context) {
 				decodedFilePath, err := url.PathUnescape(filePath)
 				if err != nil {
 					logger.LogError(ctx, ServiceLogger, fmt.Sprintf("Error decoding file path %s: %v", filePath, err))
-					log.Printf("Error decoding file path %s: %v", filePath, err)
 					continue
 				}
 
@@ -187,7 +182,6 @@ func (fs *FileService) ListenForEvents(ctx context.Context) {
 				parts := strings.Split(decodedFilePath, "/")
 				if len(parts) < 3 {
 					logger.LogError(ctx, ServiceLogger, fmt.Sprintf("Invalid file path format: %s", decodedFilePath))
-					log.Printf("Invalid file path format: %s", decodedFilePath)
 					continue
 				}
 
@@ -195,22 +189,18 @@ func (fs *FileService) ListenForEvents(ctx context.Context) {
 				questionID, err := uuid.Parse(questionIDStr)
 				if err != nil {
 					logger.LogError(ctx, ServiceLogger, fmt.Sprintf("Invalid question ID in file path: %s", questionIDStr))
-					log.Printf("Invalid question ID in file path: %s", questionIDStr)
 					continue
 				}
 
 				// Log the attachment details instead of modifying the database
 				logger.LogInfo(ctx, ServiceLogger, fmt.Sprintf("Attachment processed - QuestionID: %s, FilePath: %s", questionID.String(), decodedFilePath))
-				log.Printf("Attachment processed - QuestionID: %s, FilePath: %s", questionID.String(), decodedFilePath)
 			}
 
 			// Delete the processed event from the Redis hash
 			if _, err := fs.redisClient.HDel(ctx, redisKey, key).Result(); err != nil {
 				logger.LogError(ctx, ServiceLogger, fmt.Sprintf("Error deleting processed event for key %s: %v", key, err))
-				log.Printf("Error deleting processed event for key %s: %v", key, err)
 			} else {
 				logger.LogInfo(ctx, ServiceLogger, fmt.Sprintf("Successfully deleted processed event for key: %s", key))
-				log.Printf("Successfully deleted processed event for key: %s", key)
 			}
 		}
 
