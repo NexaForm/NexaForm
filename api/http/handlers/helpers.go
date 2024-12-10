@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
+	"go.uber.org/zap"
 )
 
 const UserClaimKey = jwt.UserClaimKey
@@ -62,4 +63,11 @@ func BodyValidator[T any](req T) error {
 		return errors.New(strings.Join(errMsgs, "and"))
 	}
 	return nil
+}
+func GetLogger(c *fiber.Ctx) *zap.Logger {
+	logger, ok := c.UserContext().Value("logger").(*zap.Logger)
+	if !ok {
+		panic("Logger not found in context") // Handle gracefully in production
+	}
+	return logger
 }

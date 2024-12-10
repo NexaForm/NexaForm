@@ -88,7 +88,7 @@ func Migrate(db *gorm.DB) error {
 		&entities.Role{},
 		&entities.Permission{},
 		&entities.SurveyRole{},
-		&entities.SurveyPermission{},
+		// &entities.SurveyPermission{},
 		&entities.SurveyParticipant{},
 		&entities.Notification{},
 		&entities.Wallet{},

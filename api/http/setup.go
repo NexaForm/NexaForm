@@ -19,32 +19,60 @@ func Run(cfg config.Config, app *service.AppContainer) {
 	// register routes
 	registerGlobalRoutes(api, app)
 	registerSurveyRoutes(api, app, secret)
+	registerRBACRoutes(api, app, secret)
 
 	log.Fatal(fiberApp.Listen(fmt.Sprintf("%s:%d", cfg.Server.Host, cfg.Server.HTTPPort)))
 }
 
 func registerGlobalRoutes(router fiber.Router, app *service.AppContainer) {
-	router.Post("/register", handlers.RegisterUser(app.AuthService()))
-	router.Post("/register/verify", handlers.VerifyEmail(app.AuthService()))
-	router.Get("/refresh", handlers.RefreshToken(app.AuthService()))
-	router.Post("/login", handlers.LoginUser(app.AuthService()))
-	// router.Post("/survey", handlers.AddSurveyHandler(app.SurveyService()))
-	// router.Post("/survey/presigned-urls", handlers.GetPresignedURLsHandler(app.SurveyService(), app.FileService()))
-	// router.Get("/survey/download-urls", handlers.GetPresignedDownloadURLsHandler(app.FileService()))
-	// router.Post("/survey/answer", handlers.CreateAnswerHandler(app.SurveyService()))
+	global := router.Group("/auth", middlewares.LoggerMiddleware(app, service.ServiceAuth))
 
+	global.Post("/register", handlers.RegisterUser(app.AuthService()))
+	global.Post("/register/verify", handlers.VerifyEmail(app.AuthService()))
+	global.Get("/refresh", handlers.RefreshToken(app.AuthService()))
+	global.Post("/login", handlers.LoginUser(app.AuthService()))
 }
 func registerSurveyRoutes(router fiber.Router, app *service.AppContainer, secret []byte) {
-	router.Post("/survey",
+	survey := router.Group("/survey", middlewares.LoggerMiddleware(app, service.ServiceSurvey))
+
+	survey.Post("",
 		middlewares.Auth(secret),
 		handlers.AddSurveyHandler(app.SurveyService()))
-	router.Post("/survey/presigned-urls",
+	survey.Post("/presigned-urls",
 		middlewares.Auth(secret),
 		handlers.GetPresignedURLsHandler(app.SurveyService(), app.FileService()))
-	router.Get("/survey/download-urls",
+	survey.Get("/download-urls",
 		middlewares.Auth(secret),
 		handlers.GetPresignedDownloadURLsHandler(app.FileService()))
-	router.Post("/survey/answer",
+	survey.Post("/answer",
 		middlewares.Auth(secret),
 		handlers.CreateAnswerHandler(app.SurveyService()))
+}
+func registerRBACRoutes(router fiber.Router, app *service.AppContainer, secret []byte) {
+	rbac := router.Group("/rbac", middlewares.LoggerMiddleware(app, service.ServiceRBAC))
+
+	// Endpoint to create survey roles
+	rbac.Post("/roles",
+		middlewares.Auth(secret),
+		handlers.CreateSurveyRoleHandler(app.RBACService()))
+
+	// Endpoint to get survey roles by ID
+	rbac.Get("/roles/:id",
+		middlewares.Auth(secret),
+		handlers.GetSurveyRoleHandler(app.RBACService()))
+
+	// Endpoint to get survey roles by survey ID
+	rbac.Get("/roles/by-survey/:survey_id",
+		middlewares.Auth(secret),
+		handlers.GetSurveyRolesBySurveyIDHandler(app.RBACService()))
+
+	// Endpoint to create survey participants
+	rbac.Post("/participants",
+		middlewares.Auth(secret),
+		handlers.CreateSurveyParticipantHandler(app.RBACService()))
+
+	// Endpoint to get survey participants by survey ID
+	rbac.Get("/participants/by-survey/:survey_id",
+		middlewares.Auth(secret),
+		handlers.GetSurveyParticipantsBySurveyIDHandler(app.RBACService()))
 }

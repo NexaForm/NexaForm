@@ -3,6 +3,7 @@ package service
 import (
 	"NexaForm/config"
 	"context"
+	"fmt"
 
 	"github.com/gofiber/fiber/v2"
 	"go.uber.org/zap"
@@ -16,6 +17,8 @@ const (
 	ServiceAPI      = "api"
 	ServiceLogger   = "logger"
 	ServiceUser     = "user"
+	ServiceSurvey   = "survey"
+	ServiceRBAC     = "rbac"
 )
 
 type LoggerService struct {
@@ -140,8 +143,32 @@ func (l *LoggerService) Sync() {
 }
 
 // GetLoggerFields returns common logging fields
-func GetLoggerFields(serviceName string) []zap.Field {
-	return []zap.Field{
-		zap.String("service", serviceName), // Adding service name as a field
+// func GetLoggerFields(serviceName string) []zap.Field {
+// 	return []zap.Field{
+// 		zap.String("service", serviceName), // Adding service name as a field
+// 	}
+// }
+
+// GetLoggerForService returns a logger scoped to a specific service name
+func (l *LoggerService) GetLoggerForService(serviceName string) (*zap.Logger, error) {
+	if logger, exists := l.loggers[serviceName]; exists {
+		return logger, nil
 	}
+	return nil, fmt.Errorf("logger for service %s not found", serviceName)
+}
+
+// AttachLoggerToContext adds the logger and context fields to the Fiber context
+func (l *LoggerService) AttachLoggerToContext(ctx context.Context, serviceName string, fiberCtx *fiber.Ctx, reqID string) context.Context {
+	if logger, exists := l.loggers[serviceName]; exists {
+		fields := []zap.Field{
+			zap.String("service", serviceName),
+			zap.String("method", fiberCtx.Method()),
+			zap.String("url", fiberCtx.OriginalURL()),
+			zap.String("ip", fiberCtx.IP()),
+			zap.String("user_agent", fiberCtx.Get("User-Agent")),
+			zap.String("X-Request-ID", reqID),
+		}
+		ctx = context.WithValue(ctx, "logger", logger.With(fields...))
+	}
+	return ctx
 }

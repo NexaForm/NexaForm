@@ -9,24 +9,34 @@ import (
 // survey role mappers
 func SurveyRoleEntityToDomain(entity *entities.SurveyRole) *rbac.SurveyRole {
 	return &rbac.SurveyRole{
-		ID:           entity.ID,
-		SurveyID:     entity.SurveyID,
-		Name:         entity.Name,
-		Permissions:  BatchSurveyPermissionEntityToDomain(entity.Permissions),
-		Participants: BatchSurveyParticipantEntityToDomain(entity.Participants),
-		CreatedAt:    entity.CreatedAt,
-		UpdatedAt:    entity.UpdatedAt,
+		ID:                   entity.ID,
+		SurveyID:             entity.SurveyID,
+		Name:                 entity.Name,
+		CanWatchSurvey:       entity.CanWatchSurvey,
+		CanWatchExposedVotes: entity.CanWatchExposedVotes,
+		CanVote:              entity.CanVote,
+		CanEditSurvey:        entity.CanWatchSurvey,
+		CanAssignRole:        entity.CanAssignRole,
+		CanAccessReports:     entity.CanAccessReports,
+		Participants:         BatchSurveyParticipantEntityToDomain(entity.Participants),
+		CreatedAt:            entity.CreatedAt,
+		UpdatedAt:            entity.UpdatedAt,
 	}
 }
 func surveyRoleEntityToDomain(entity entities.SurveyRole) rbac.SurveyRole {
 	return rbac.SurveyRole{
-		ID:           entity.ID,
-		SurveyID:     entity.SurveyID,
-		Name:         entity.Name,
-		Permissions:  BatchSurveyPermissionEntityToDomain(entity.Permissions),
-		Participants: BatchSurveyParticipantEntityToDomain(entity.Participants),
-		CreatedAt:    entity.CreatedAt,
-		UpdatedAt:    entity.UpdatedAt,
+		ID:                   entity.ID,
+		SurveyID:             entity.SurveyID,
+		Name:                 entity.Name,
+		CanWatchSurvey:       entity.CanWatchSurvey,
+		CanWatchExposedVotes: entity.CanWatchExposedVotes,
+		CanVote:              entity.CanVote,
+		CanEditSurvey:        entity.CanWatchSurvey,
+		CanAssignRole:        entity.CanAssignRole,
+		CanAccessReports:     entity.CanAccessReports,
+		Participants:         BatchSurveyParticipantEntityToDomain(entity.Participants),
+		CreatedAt:            entity.CreatedAt,
+		UpdatedAt:            entity.UpdatedAt,
 	}
 }
 func BatchSurveyRoleEntityToDomain(entities []entities.SurveyRole) []rbac.SurveyRole {
@@ -34,97 +44,34 @@ func BatchSurveyRoleEntityToDomain(entities []entities.SurveyRole) []rbac.Survey
 }
 func SurveyRoleDomainToEntity(domain *rbac.SurveyRole) *entities.SurveyRole {
 	return &entities.SurveyRole{
-		ID:           domain.ID,
-		SurveyID:     domain.SurveyID,
-		Name:         domain.Name,
-		Permissions:  BatchSurveyPermissionDomainToEntity(domain.Permissions),
-		Participants: BatchSurveyParticipantDomainToEntity(domain.Participants),
+		ID:                   domain.ID,
+		SurveyID:             domain.SurveyID,
+		Name:                 domain.Name,
+		CanWatchSurvey:       domain.CanWatchSurvey,
+		CanWatchExposedVotes: domain.CanWatchExposedVotes,
+		CanVote:              domain.CanVote,
+		CanEditSurvey:        domain.CanWatchSurvey,
+		CanAssignRole:        domain.CanAssignRole,
+		CanAccessReports:     domain.CanAccessReports,
+		Participants:         BatchSurveyParticipantDomainToEntity(domain.Participants),
 	}
 }
 func surveyRoleDomainToEntity(domain rbac.SurveyRole) entities.SurveyRole {
 	return entities.SurveyRole{
-		ID:           domain.ID,
-		SurveyID:     domain.SurveyID,
-		Name:         domain.Name,
-		Permissions:  BatchSurveyPermissionDomainToEntity(domain.Permissions),
-		Participants: BatchSurveyParticipantDomainToEntity(domain.Participants),
+		ID:                   domain.ID,
+		SurveyID:             domain.SurveyID,
+		Name:                 domain.Name,
+		CanWatchSurvey:       domain.CanWatchSurvey,
+		CanWatchExposedVotes: domain.CanWatchExposedVotes,
+		CanVote:              domain.CanVote,
+		CanEditSurvey:        domain.CanWatchSurvey,
+		CanAssignRole:        domain.CanAssignRole,
+		CanAccessReports:     domain.CanAccessReports,
+		Participants:         BatchSurveyParticipantDomainToEntity(domain.Participants),
 	}
 }
 func BatchSurveyRoleDomainToEntity(domains []rbac.SurveyRole) []entities.SurveyRole {
 	return fp.Map(domains, surveyRoleDomainToEntity)
-}
-
-// survey permissions mappers
-
-func SurveyPermissionEntityToDomain(entity *entities.SurveyPermission) *rbac.SurveyPermission {
-	return &rbac.SurveyPermission{
-		ID:                   entity.ID,
-		SurveyID:             entity.SurveyID,
-		Name:                 entity.Name,
-		SurveyRoles:          BatchSurveyRoleEntityToDomain(entity.SurveyRoles),
-		Description:          entity.Description,
-		CanWatchSurvey:       entity.CanWatchSurvey,
-		CanWatchExposedVotes: entity.CanWatchExposedVotes,
-		CanVote:              entity.CanVote,
-		CanEditSurvey:        entity.CanEditSurvey,
-		CanAssignRole:        entity.CanAssignRole,
-		CanAccessReports:     entity.CanAccessReports,
-		CreatedAt:            entity.CreatedAt,
-		UpdatedAt:            entity.UpdatedAt,
-	}
-}
-func surveyPermissionEntityToDomain(entity entities.SurveyPermission) rbac.SurveyPermission {
-	return rbac.SurveyPermission{
-		ID:                   entity.ID,
-		SurveyID:             entity.SurveyID,
-		Name:                 entity.Name,
-		SurveyRoles:          BatchSurveyRoleEntityToDomain(entity.SurveyRoles),
-		Description:          entity.Description,
-		CanWatchSurvey:       entity.CanWatchSurvey,
-		CanWatchExposedVotes: entity.CanWatchExposedVotes,
-		CanVote:              entity.CanVote,
-		CanEditSurvey:        entity.CanEditSurvey,
-		CanAssignRole:        entity.CanAssignRole,
-		CanAccessReports:     entity.CanAccessReports,
-		CreatedAt:            entity.CreatedAt,
-		UpdatedAt:            entity.UpdatedAt,
-	}
-}
-func BatchSurveyPermissionEntityToDomain(entities []entities.SurveyPermission) []rbac.SurveyPermission {
-	return fp.Map(entities, surveyPermissionEntityToDomain)
-}
-func SurveyPermissionDomainToEntity(domain *rbac.SurveyPermission) *entities.SurveyPermission {
-	return &entities.SurveyPermission{
-		ID:                   domain.ID,
-		SurveyID:             domain.SurveyID,
-		Name:                 domain.Name,
-		SurveyRoles:          BatchSurveyRoleDomainToEntity(domain.SurveyRoles),
-		Description:          domain.Description,
-		CanWatchSurvey:       domain.CanWatchSurvey,
-		CanWatchExposedVotes: domain.CanWatchExposedVotes,
-		CanVote:              domain.CanVote,
-		CanEditSurvey:        domain.CanEditSurvey,
-		CanAssignRole:        domain.CanAssignRole,
-		CanAccessReports:     domain.CanAccessReports,
-	}
-}
-func surveyPermissionDomainToEntity(domain rbac.SurveyPermission) entities.SurveyPermission {
-	return entities.SurveyPermission{
-		ID:                   domain.ID,
-		SurveyID:             domain.SurveyID,
-		Name:                 domain.Name,
-		SurveyRoles:          BatchSurveyRoleDomainToEntity(domain.SurveyRoles),
-		Description:          domain.Description,
-		CanWatchSurvey:       domain.CanWatchSurvey,
-		CanWatchExposedVotes: domain.CanWatchExposedVotes,
-		CanVote:              domain.CanVote,
-		CanEditSurvey:        domain.CanEditSurvey,
-		CanAssignRole:        domain.CanAssignRole,
-		CanAccessReports:     domain.CanAccessReports,
-	}
-}
-func BatchSurveyPermissionDomainToEntity(domains []rbac.SurveyPermission) []entities.SurveyPermission {
-	return fp.Map(domains, surveyPermissionDomainToEntity)
 }
 
 // survey participants mappers
@@ -147,6 +94,7 @@ func surveyParticipantEntityToDomain(entity entities.SurveyParticipant) rbac.Sur
 		SurveyID:     entity.SurveyID,
 		UserID:       entity.UserID,
 		SurveyRoleID: entity.SurveyRoleID,
+		SurveyRole:   *SurveyRoleEntityToDomain(&entity.SurveyRole),
 		IsExposed:    entity.IsExposed,
 		RoleExpire:   entity.RoleExpire,
 		CreatedAt:    entity.CreatedAt,

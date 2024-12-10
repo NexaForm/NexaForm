@@ -3,6 +3,7 @@ package service
 import (
 	"NexaForm/config"
 	"NexaForm/internal/otp"
+	"NexaForm/internal/rbac"
 	"NexaForm/internal/survey"
 	"NexaForm/internal/user"
 	"NexaForm/pkg/adapters/storage"
@@ -19,6 +20,7 @@ type AppContainer struct {
 	loggerService *LoggerService
 	surveyService *SurveyService
 	fileService   *FileService
+	rbacSercice   *RBACService
 }
 
 // NewAppContainer initializes the app container with services
@@ -32,6 +34,7 @@ func NewAppContainer(cfg config.Config) (*AppContainer, error) {
 	app.setLoggerService()
 	app.setSurveyService()
 	app.setFileService()
+	app.setRBACService()
 	return app, nil
 }
 
@@ -146,3 +149,26 @@ func (a *AppContainer) setFileService() {
 func (a *AppContainer) FileService() *FileService {
 	return a.fileService
 }
+func (a *AppContainer) setRBACService() {
+	if a.rbacSercice != nil {
+		return
+	}
+
+	rbacService := NewRBACService(rbac.NewOps(storage.NewRBACRepo(a.dbConn)))
+
+	a.rbacSercice = rbacService
+	log.Println("RBACService initialized successfully.")
+}
+
+// FileService returns the FileService instance
+func (a *AppContainer) RBACService() *RBACService {
+	return a.rbacSercice
+}
+
+// func (a *AppContainer) GetLoggerForService(serviceName string) (*zap.Logger, error) {
+// 	return a.loggerService.GetLoggerForService(serviceName)
+// }
+
+// func (a *AppContainer) AttachLoggerToContext(ctx context.Context, serviceName string, fiberCtx *fiber.Ctx) context.Context {
+// 	return a.loggerService.AttachLoggerToContext(ctx, serviceName, fiberCtx)
+// }
