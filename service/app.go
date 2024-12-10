@@ -135,6 +135,7 @@ func (a *AppContainer) setFileService() {
 		"minioadmin",     // Secret Key
 		"attachments",    // Bucket Name (can be customized)
 		false,            // Use SSL (false for local setup)
+		a.loggerService,
 	)
 
 	if err != nil {

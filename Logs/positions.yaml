@@ -1,4 +1,6 @@
 positions:
-  /var/log/my-service/auth.log: "1917"
+  /var/log/my-service/auth.log: "3947"
+  /var/log/my-service/logger.log: "566"
   /var/log/my-service/rbac.log: "0"
+  /var/log/my-service/survey.log: "1719"
   /var/log/my-service/user.log: "0"
