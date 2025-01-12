@@ -1,0 +1,39 @@
+{
+	"version": "28",
+	"credential": {
+		"accessKey": "minioadmin",
+		"secretKey": "minioadmin"
+	},
+	"region": "us-east-1",
+	"browser": "on",
+	"logger": {
+		"console": {
+			"enable": true
+		},
+		"file": {
+			"enable": false,
+			"filename": ""
+		}
+	},
+	"notify": {
+		"nats": {
+			"primary": {
+				"enable": true,
+				"address": "nats:4222",
+				"subject": "minio_events",
+				"username": "user",
+				"password": "password",
+				"token": "",
+				"secure": false,
+				"tls_skip_verify": true,
+				"pingInterval": "0s",
+				"jetstream": {
+					"enable": true,
+					"stream": "minio_stream"
+				},
+				"queue_dir": "/data/minio-events",
+				"queue_limit": 100000
+			}
+		}
+	}
+}
